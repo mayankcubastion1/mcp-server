@@ -36,14 +36,18 @@ def mock_get_leaves(monkeypatch):
         ],
     )
 
-    async def _mock(fy_id: str) -> LeavesResponse:
+    async def _mock(fy_id: str, auth_header: str) -> LeavesResponse:
         return sample
 
     monkeypatch.setattr(hrms_client, "get_leaves", _mock)
 
 
 def test_leaves_endpoint(mock_get_leaves):
-    response = client.get("/leaves", params={"fyId": "roxq0g78pis7ia9"})
+    response = client.get(
+        "/leaves",
+        params={"fyId": "roxq0g78pis7ia9"},
+        headers={"Authorization": "Bearer token"},
+    )
     assert response.status_code == 200
     body = response.json()
     assert body["statusCode"] == 200
