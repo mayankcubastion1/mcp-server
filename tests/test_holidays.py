@@ -20,14 +20,18 @@ def mock_get_holidays(monkeypatch):
         rhBalance=2,
     )
 
-    async def _mock(year: int) -> HolidaysResponse:
+    async def _mock(year: int, auth_header: str) -> HolidaysResponse:
         return sample
 
     monkeypatch.setattr(hrms_client, "get_holidays", _mock)
 
 
 def test_holidays_endpoint(mock_get_holidays):
-    response = client.get("/holidays", params={"year": 2025})
+    response = client.get(
+        "/holidays",
+        params={"year": 2025},
+        headers={"Authorization": "Bearer token"},
+    )
     assert response.status_code == 200
     body = response.json()
     assert body["statusCode"] == 200
