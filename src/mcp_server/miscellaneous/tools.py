@@ -16,6 +16,8 @@ class EmployeeIdInput(BaseModel):
 
 
 class EmptyInput(BaseModel):
+    """Schema for endpoints that require no parameters."""
+
     pass
 
 
@@ -27,6 +29,11 @@ def create_tool_specs(
     """Create tool specifications for miscellaneous APIs."""
 
     http_client = client or httpx.Client(base_url=base_url)
+
+    def _health() -> dict:
+        response = http_client.get("/health")
+        response.raise_for_status()
+        return response.json()
 
     def _get_financial_years() -> dict:
         response = http_client.get(
@@ -45,6 +52,12 @@ def create_tool_specs(
         return response.json()
 
     return [
+        ToolSpec(
+            name="health",
+            description="Check server health status.",
+            args_schema=EmptyInput,
+            func=_health,
+        ),
         ToolSpec(
             name="get_financial_years",
             description="Fetch financial year data for the current employee.",

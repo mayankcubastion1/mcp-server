@@ -17,6 +17,18 @@ class TicketsInput(BaseModel):
     page: int = Field(1, description="Page number", ge=1)
 
 
+class SubmitTicketInput(BaseModel):
+    """Input for submitting a ticket."""
+
+    id: str = Field(..., description="Identifier of the ticket to submit")
+
+
+class EmptyInput(BaseModel):
+    """Schema for endpoints that require no parameters."""
+
+    pass
+
+
 def create_tool_specs(
     base_url: str,
     auth_header_getter: Callable[[], str],
@@ -35,13 +47,42 @@ def create_tool_specs(
         response.raise_for_status()
         return response.json()
 
+    def _raise_ticket() -> dict:
+        response = http_client.post(
+            "/tickets/draft",
+            headers={"Authorization": auth_header_getter()},
+        )
+        response.raise_for_status()
+        return response.json()
+
+    def _submit_ticket(id: str) -> dict:
+        response = http_client.post(
+            "/tickets/submit",
+            params={"id": id},
+            headers={"Authorization": auth_header_getter()},
+        )
+        response.raise_for_status()
+        return response.json()
+
     return [
         ToolSpec(
             name="get_tickets",
             description="Fetch tickets for the current employee.",
             args_schema=TicketsInput,
             func=_get_tickets,
-        )
+        ),
+        ToolSpec(
+            name="raise_ticket",
+            description="Create a new ticket draft.",
+            args_schema=EmptyInput,
+            func=_raise_ticket,
+        ),
+        ToolSpec(
+            name="submit_ticket",
+            description="Submit a draft ticket.",
+            args_schema=SubmitTicketInput,
+            func=_submit_ticket,
+        ),
     ]
 
 

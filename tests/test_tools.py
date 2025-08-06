@@ -11,6 +11,8 @@ from mcp_server.leaves.models import (
     Holiday,
     HolidaysResponse,
 )
+from mcp_server.attendance.models import AttendanceEntry, AttendanceResponse, Paginate
+from mcp_server.attendance.router import client as attendance_client
 from mcp_server.tools import create_langchain_tools
 
 
@@ -91,3 +93,37 @@ def test_apply_leave_tool(mock_apply_leave, tools):
     result = apply_tool.invoke(payload)
     assert result["statusMessage"] == "Document created successfully"
     assert result["data"]["category"] == "Leave"
+
+
+@pytest.fixture
+def mock_get_attendance(monkeypatch):
+    sample = AttendanceResponse(
+        statusCode=200,
+        statusMessage="OK",
+        data=[
+            AttendanceEntry(
+                id="1",
+                attendanceDate=date(2025, 5, 1),
+                createdAt=datetime(2025, 5, 1, 9, 0, 0),
+                updatedAt=datetime(2025, 5, 1, 9, 0, 0),
+            )
+        ],
+        paginate=Paginate(
+            totalRecords=1,
+            totalPerpage=10,
+            totalPage=1,
+            currentPage=1,
+        ),
+    )
+
+    async def _mock(year: int, month: int, auth_header: str) -> AttendanceResponse:
+        return sample
+
+    monkeypatch.setattr(attendance_client, "get_my_attendance", _mock)
+
+
+def test_get_attendance_tool(mock_get_attendance, tools):
+    attendance_tool = next(t for t in tools if t.name == "get_attendance")
+    result = attendance_tool.invoke({"year": 2025, "month": 5})
+    assert result["statusCode"] == 200
+    assert result["data"][0]["Id"] == "1"
