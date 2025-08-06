@@ -7,6 +7,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY src /app/src
 ENV PYTHONPATH=/app/src
+ENV HRMS_API_BASE_URL=https://devxnet2api.cubastion.net/api/v2
 
 EXPOSE 8000
 
