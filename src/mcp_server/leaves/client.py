@@ -56,3 +56,16 @@ class LeavesClient:
             )
             response.raise_for_status()
             return ApplyLeaveResponse.model_validate(response.json())
+
+    async def apply_comp_off(
+        self, payload: ApplyLeaveRequest, auth_header: str
+    ) -> ApplyLeaveResponse:
+        """Submit a comp-off application."""
+        async with httpx.AsyncClient(timeout=self.timeout) as client:
+            response = await client.post(
+                f"{self.base_url}/attendance/leaves/apply/comp-off",
+                json=payload.model_dump(),
+                headers={"Authorization": auth_header},
+            )
+            response.raise_for_status()
+            return ApplyLeaveResponse.model_validate(response.json())
