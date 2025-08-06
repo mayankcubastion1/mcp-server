@@ -84,3 +84,23 @@ The service will be available at `http://localhost:8000`.
 5. **Run `pytest`** before committing to verify everything works.
 
 Following this pattern allows the MCP server to expand as additional HRMS APIs are exposed.
+
+## Using from LangChain
+
+The module `mcp_server.tools` exposes a helper to register the MCP endpoints as
+LangChain tools.  These tools can be used by a LangChain agent or a LangGraph
+workflow so an LLM can call the HRMS APIs directly:
+
+```python
+from mcp_server.tools import create_hrms_tools
+
+tools = create_hrms_tools(
+    base_url="http://localhost:8000",
+    auth_header_getter=lambda: "Bearer <token>",
+)
+
+# tools now contains StructuredTool instances: get_holidays, get_leaves and apply_leave
+```
+
+Each tool returns the JSON response from the corresponding MCP endpoint and can
+be supplied to any LangChain agent that supports structured tool calling.
