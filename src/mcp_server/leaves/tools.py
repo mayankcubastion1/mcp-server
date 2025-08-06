@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-"""LangChain tools for interacting with the MCP server endpoints."""
+"""Tools for interacting with leave-related MCP server endpoints."""
 
 from typing import Callable, List, Optional
 
@@ -8,6 +8,7 @@ import httpx
 from langchain_core.tools import StructuredTool
 from pydantic import BaseModel, Field
 
+from ..tools.base import ToolSpec
 from .models import ApplyLeaveRequest
 
 
@@ -23,23 +24,12 @@ class LeavesInput(BaseModel):
     fyId: str = Field(..., description="Financial year identifier")
 
 
-def create_hrms_tools(
+def create_tool_specs(
     base_url: str,
     auth_header_getter: Callable[[], str],
     client: Optional[httpx.Client] = None,
-) -> List[StructuredTool]:
-    """Create LangChain tools wrapping the MCP server endpoints.
-
-    Parameters
-    ----------
-    base_url:
-        Base URL of the running MCP server (e.g. ``"http://localhost:8000"``).
-    auth_header_getter:
-        Callable that returns the value for the ``Authorization`` header.
-    client:
-        Optional ``httpx.Client`` instance.  If omitted, a new client will be
-        created using the given ``base_url``.
-    """
+) -> List[ToolSpec]:
+    """Create framework-agnostic tool specifications for leave APIs."""
 
     http_client = client or httpx.Client(base_url=base_url)
 
@@ -77,25 +67,42 @@ def create_hrms_tools(
         response.raise_for_status()
         return response.json()
 
-    holidays_tool = StructuredTool.from_function(
-        func=_get_holidays,
-        name="get_holidays",
-        description="Fetch holidays for the provided year.",
-        args_schema=HolidaysInput,
-    )
+    return [
+        ToolSpec(
+            name="get_holidays",
+            description="Fetch holidays for the provided year.",
+            args_schema=HolidaysInput,
+            func=_get_holidays,
+        ),
+        ToolSpec(
+            name="get_leaves",
+            description="Fetch leave records for a financial year.",
+            args_schema=LeavesInput,
+            func=_get_leaves,
+        ),
+        ToolSpec(
+            name="apply_leave",
+            description="Apply for a leave or comp-off.",
+            args_schema=ApplyLeaveRequest,
+            func=_apply_leave,
+        ),
+    ]
 
-    leaves_tool = StructuredTool.from_function(
-        func=_get_leaves,
-        name="get_leaves",
-        description="Fetch leave records for a financial year.",
-        args_schema=LeavesInput,
-    )
 
-    apply_leave_tool = StructuredTool.from_function(
-        func=_apply_leave,
-        name="apply_leave",
-        description="Apply for a leave or comp-off.",
-        args_schema=ApplyLeaveRequest,
-    )
+def create_langchain_tools(
+    base_url: str,
+    auth_header_getter: Callable[[], str],
+    client: Optional[httpx.Client] = None,
+) -> List[StructuredTool]:
+    """Create LangChain StructuredTool instances for leave APIs."""
 
-    return [holidays_tool, leaves_tool, apply_leave_tool]
+    specs = create_tool_specs(base_url, auth_header_getter, client)
+    return [
+        StructuredTool.from_function(
+            func=spec.func,
+            name=spec.name,
+            description=spec.description,
+            args_schema=spec.args_schema,
+        )
+        for spec in specs
+    ]
