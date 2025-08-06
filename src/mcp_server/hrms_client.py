@@ -1,7 +1,7 @@
-from fastapi import FastAPI, Header, HTTPException, Query
+import os
+
 import httpx
 
-from .hrms_client import HRMSClient
 from .models import (
     ApplyLeaveRequest,
     ApplyLeaveResponse,
@@ -9,46 +9,49 @@ from .models import (
     LeavesResponse,
 )
 
-app = FastAPI(title="MCP Server")
-client = HRMSClient()
 
+class HRMSClient:
+    """Client for interacting with the HRMS portal API."""
 
-@app.get("/health")
-async def health() -> dict[str, str]:
-    """Health check endpoint."""
-    return {"status": "ok"}
+    def __init__(
+        self, base_url: str | None = None, timeout: float = 10.0
+    ) -> None:
+        self.base_url = base_url or os.getenv("HRMS_API_BASE_URL")
+        if not self.base_url:
+            raise RuntimeError("HRMS_API_BASE_URL is not configured")
+        self.timeout = timeout
 
+    async def get_holidays(self, year: int, auth_header: str) -> HolidaysResponse:
+        """Retrieve holiday information for the given year."""
+        async with httpx.AsyncClient(timeout=self.timeout) as client:
+            response = await client.get(
+                f"{self.base_url}/app/employees/holidays",
+                params={"year": year},
+                headers={"Authorization": auth_header},
+            )
+            response.raise_for_status()
+            return HolidaysResponse.model_validate(response.json())
 
-@app.get("/holidays", response_model=HolidaysResponse)
-async def holidays(
-    year: int = Query(..., ge=1900, le=2100),
-    authorization: str = Header(...),
-) -> HolidaysResponse:
-    """Retrieve holidays for a given year."""
-    try:
-        return await client.get_holidays(year, authorization)
-    except httpx.HTTPError as exc:
-        raise HTTPException(status_code=502, detail=str(exc)) from exc
+    async def get_leaves(self, fy_id: str, auth_header: str) -> LeavesResponse:
+        """Retrieve leave entries for the specified financial year id."""
+        async with httpx.AsyncClient(timeout=self.timeout) as client:
+            response = await client.get(
+                f"{self.base_url}/attendance/leaves/my-leaves",
+                params={"fyId": fy_id},
+                headers={"Authorization": auth_header},
+            )
+            response.raise_for_status()
+            return LeavesResponse.model_validate(response.json())
 
-
-@app.get("/leaves", response_model=LeavesResponse)
-async def leaves(
-    fy_id: str = Query(..., alias="fyId"),
-    authorization: str = Header(...),
-) -> LeavesResponse:
-    """Retrieve leave entries for the provided financial year identifier."""
-    try:
-        return await client.get_leaves(fy_id, authorization)
-    except httpx.HTTPError as exc:
-        raise HTTPException(status_code=502, detail=str(exc)) from exc
-
-
-@app.post("/leaves/apply", response_model=ApplyLeaveResponse)
-async def apply_leave(
-    body: ApplyLeaveRequest, authorization: str = Header(...)
-) -> ApplyLeaveResponse:
-    """Apply for a leave or comp-off."""
-    try:
-        return await client.apply_leave(body, authorization)
-    except httpx.HTTPError as exc:
-        raise HTTPException(status_code=502, detail=str(exc)) from exc
+    async def apply_leave(
+        self, payload: ApplyLeaveRequest, auth_header: str
+    ) -> ApplyLeaveResponse:
+        """Submit a leave application."""
+        async with httpx.AsyncClient(timeout=self.timeout) as client:
+            response = await client.post(
+                f"{self.base_url}/attendance/leaves/apply",
+                json=payload.model_dump(),
+                headers={"Authorization": auth_header},
+            )
+            response.raise_for_status()
+            return ApplyLeaveResponse.model_validate(response.json())
