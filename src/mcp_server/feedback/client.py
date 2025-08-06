@@ -2,7 +2,12 @@ import os
 from dotenv import load_dotenv
 import httpx
 
-from .models import AddFeedbackRequest, AddFeedbackResponse
+from .models import (
+    AddFeedbackRequest,
+    AddFeedbackResponse,
+    RMFeedbacksResponse,
+    FeedbackLevelsResponse,
+)
 
 load_dotenv()
 
@@ -28,3 +33,29 @@ class FeedbackClient:
             )
             response.raise_for_status()
             return AddFeedbackResponse.model_validate(response.json())
+
+    async def get_rm_feedbacks(
+        self, auth_header: str, emp_id: str = ""
+    ) -> RMFeedbacksResponse:
+        """Retrieve RM feedback entries."""
+        params = {"id": emp_id, "tab": "RMFeedbacks"}
+        async with httpx.AsyncClient(timeout=self.timeout) as client:
+            response = await client.get(
+                f"{self.base_url}/app/employeeNotes/genericNotes",
+                params=params,
+                headers={"Authorization": auth_header},
+            )
+            response.raise_for_status()
+            return RMFeedbacksResponse.model_validate(response.json())
+
+    async def get_feedback_levels(
+        self, auth_header: str
+    ) -> FeedbackLevelsResponse:
+        """List users available for feedback."""
+        async with httpx.AsyncClient(timeout=self.timeout) as client:
+            response = await client.get(
+                f"{self.base_url}/app/employeeNotes/feedbackLevels",
+                headers={"Authorization": auth_header},
+            )
+            response.raise_for_status()
+            return FeedbackLevelsResponse.model_validate(response.json())

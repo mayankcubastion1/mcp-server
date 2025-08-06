@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 import httpx
 
-from .models import TicketsResponse
+from .models import TicketsResponse, TicketOperationResponse
 
 load_dotenv()
 
@@ -29,3 +29,30 @@ class TicketsClient:
             )
             response.raise_for_status()
             return TicketsResponse.model_validate(response.json())
+
+    async def raise_ticket(
+        self, auth_header: str, form_data: dict | None = None
+    ) -> TicketOperationResponse:
+        """Create a new ticket draft."""
+        async with httpx.AsyncClient(timeout=self.timeout) as client:
+            response = await client.post(
+                f"{self.base_url}/ticket-asset/tickets/employee",
+                data=form_data or {},
+                headers={"Authorization": auth_header},
+            )
+            response.raise_for_status()
+            return TicketOperationResponse.model_validate(response.json())
+
+    async def submit_ticket(
+        self, ticket_id: str, auth_header: str
+    ) -> TicketOperationResponse:
+        """Submit a draft ticket."""
+        params = {"id": ticket_id}
+        async with httpx.AsyncClient(timeout=self.timeout) as client:
+            response = await client.post(
+                f"{self.base_url}/ticket-asset/tickets/submit",
+                params=params,
+                headers={"Authorization": auth_header},
+            )
+            response.raise_for_status()
+            return TicketOperationResponse.model_validate(response.json())

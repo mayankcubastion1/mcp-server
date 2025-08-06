@@ -29,3 +29,11 @@ class TicketsResponse(BaseModel):
     statusMessage: str
     data: List[TicketEntry]
     paginate: Paginate
+
+
+class TicketOperationResponse(BaseModel):
+    """Generic response for ticket creation or submission."""
+
+    statusCode: int
+    statusMessage: str
+    data: Optional[dict] = None

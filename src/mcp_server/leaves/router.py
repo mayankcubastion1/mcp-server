@@ -45,3 +45,14 @@ async def apply_leave(
         return await client.apply_leave(body, authorization)
     except httpx.HTTPError as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+
+@router.post("/leaves/apply/comp-off", response_model=ApplyLeaveResponse)
+async def apply_comp_off(
+    body: ApplyLeaveRequest, authorization: str = Header(...)
+) -> ApplyLeaveResponse:
+    """Apply for a comp-off credit."""
+    try:
+        return await client.apply_comp_off(body, authorization)
+    except httpx.HTTPError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
