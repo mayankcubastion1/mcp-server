@@ -30,7 +30,7 @@ def mock_apply_leave(monkeypatch):
         ),
     )
 
-    async def _mock(payload: ApplyLeaveRequest) -> ApplyLeaveResponse:
+    async def _mock(payload: ApplyLeaveRequest, auth_header: str) -> ApplyLeaveResponse:
         return sample
 
     monkeypatch.setattr(hrms_client, "apply_leave", _mock)
@@ -47,7 +47,11 @@ payload = {
 
 
 def test_apply_leave_endpoint(mock_apply_leave):
-    response = client.post("/leaves/apply", json=payload)
+    response = client.post(
+        "/leaves/apply",
+        json=payload,
+        headers={"Authorization": "Bearer token"},
+    )
     assert response.status_code == 200
     body = response.json()
     assert body["data"]["category"] == "Leave"
