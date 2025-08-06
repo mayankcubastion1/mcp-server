@@ -1,9 +1,10 @@
 import os
-
+from dotenv import load_dotenv
 import httpx
 
 from .models import AttendanceResponse
 
+load_dotenv()
 
 class AttendanceClient:
     """Client for interacting with attendance related APIs."""

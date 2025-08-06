@@ -1,9 +1,10 @@
 import os
-
+from dotenv import load_dotenv
 import httpx
 
 from .models import TicketsResponse
 
+load_dotenv()
 
 class TicketsClient:
     """Client for interacting with ticket related APIs."""

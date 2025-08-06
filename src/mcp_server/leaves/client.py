@@ -1,5 +1,5 @@
 import os
-
+from dotenv import load_dotenv
 import httpx
 
 from .models import (
@@ -9,6 +9,7 @@ from .models import (
     LeavesResponse,
 )
 
+load_dotenv()
 
 class LeavesClient:
     """Client for interacting with leave‑related HRMS APIs."""

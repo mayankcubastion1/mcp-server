@@ -1,9 +1,10 @@
 import os
-
+from dotenv import load_dotenv
 import httpx
 
 from .models import AddFeedbackRequest, AddFeedbackResponse
 
+load_dotenv()
 
 class FeedbackClient:
     """Client for interacting with feedback related APIs."""

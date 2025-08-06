@@ -1,9 +1,10 @@
 import os
-
+from dotenv import load_dotenv
 import httpx
 
 from .models import FinancialYearsResponse, ProfileResponse
 
+load_dotenv()
 
 class MiscClient:
     """Client for miscellaneous APIs such as profile and financial years."""

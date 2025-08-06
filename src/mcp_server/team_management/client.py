@@ -1,9 +1,10 @@
 import os
-
+from dotenv import load_dotenv
 import httpx
 
 from .models import TeamLedgerResponse
 
+load_dotenv()
 
 class TeamManagementClient:
     """Client for team management related APIs."""
