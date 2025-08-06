@@ -2,7 +2,12 @@ import os
 
 import httpx
 
-from .models import HolidaysResponse, LeavesResponse
+from .models import (
+    ApplyLeaveRequest,
+    ApplyLeaveResponse,
+    HolidaysResponse,
+    LeavesResponse,
+)
 
 
 class HRMSClient:
@@ -31,3 +36,13 @@ class HRMSClient:
             )
             response.raise_for_status()
             return LeavesResponse.model_validate(response.json())
+
+    async def apply_leave(self, payload: ApplyLeaveRequest) -> ApplyLeaveResponse:
+        """Submit a leave application."""
+        async with httpx.AsyncClient(timeout=self.timeout) as client:
+            response = await client.post(
+                f"{self.base_url}/attendance/leaves/apply",
+                json=payload.model_dump(),
+            )
+            response.raise_for_status()
+            return ApplyLeaveResponse.model_validate(response.json())
