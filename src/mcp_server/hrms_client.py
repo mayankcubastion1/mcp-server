@@ -13,36 +13,45 @@ from .models import (
 class HRMSClient:
     """Client for interacting with the HRMS portal API."""
 
-    def __init__(self, base_url: str | None = None, timeout: float = 10.0) -> None:
-        self.base_url = base_url or os.getenv(
-            "HRMS_API_BASE_URL", "https://devxnet2api.cubastion.net/api/v2"
-        )
+    def __init__(
+        self, base_url: str | None = None, timeout: float = 10.0
+    ) -> None:
+        self.base_url = base_url or os.getenv("HRMS_API_BASE_URL")
+        if not self.base_url:
+            raise RuntimeError("HRMS_API_BASE_URL is not configured")
         self.timeout = timeout
 
-    async def get_holidays(self, year: int) -> HolidaysResponse:
+    async def get_holidays(self, year: int, auth_header: str) -> HolidaysResponse:
         """Retrieve holiday information for the given year."""
         async with httpx.AsyncClient(timeout=self.timeout) as client:
             response = await client.get(
-                f"{self.base_url}/app/employees/holidays", params={"year": year}
+                f"{self.base_url}/app/employees/holidays",
+                params={"year": year},
+                headers={"Authorization": auth_header},
             )
             response.raise_for_status()
             return HolidaysResponse.model_validate(response.json())
 
-    async def get_leaves(self, fy_id: str) -> LeavesResponse:
+    async def get_leaves(self, fy_id: str, auth_header: str) -> LeavesResponse:
         """Retrieve leave entries for the specified financial year id."""
         async with httpx.AsyncClient(timeout=self.timeout) as client:
             response = await client.get(
-                f"{self.base_url}/attendance/leaves/my-leaves", params={"fyId": fy_id}
+                f"{self.base_url}/attendance/leaves/my-leaves",
+                params={"fyId": fy_id},
+                headers={"Authorization": auth_header},
             )
             response.raise_for_status()
             return LeavesResponse.model_validate(response.json())
 
-    async def apply_leave(self, payload: ApplyLeaveRequest) -> ApplyLeaveResponse:
+    async def apply_leave(
+        self, payload: ApplyLeaveRequest, auth_header: str
+    ) -> ApplyLeaveResponse:
         """Submit a leave application."""
         async with httpx.AsyncClient(timeout=self.timeout) as client:
             response = await client.post(
                 f"{self.base_url}/attendance/leaves/apply",
                 json=payload.model_dump(),
+                headers={"Authorization": auth_header},
             )
             response.raise_for_status()
             return ApplyLeaveResponse.model_validate(response.json())
