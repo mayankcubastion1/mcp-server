@@ -1,54 +1,20 @@
-from fastapi import FastAPI, Header, HTTPException, Query
-import httpx
+from fastapi import FastAPI
 
-from .hrms_client import HRMSClient
-from .models import (
-    ApplyLeaveRequest,
-    ApplyLeaveResponse,
-    HolidaysResponse,
-    LeavesResponse,
-)
+from .attendance.router import router as attendance_router
+from .feedback.router import router as feedback_router
+from .leaves.router import router as leaves_router, client as client
+from .miscellaneous.router import router as misc_router
+from .tickets.router import router as tickets_router
+from .team_management.router import router as team_management_router
 
 app = FastAPI(title="MCP Server")
-client = HRMSClient()
 
+# Core routes
+app.include_router(misc_router)
+app.include_router(leaves_router)
 
-@app.get("/health")
-async def health() -> dict[str, str]:
-    """Health check endpoint."""
-    return {"status": "ok"}
-
-
-@app.get("/holidays", response_model=HolidaysResponse)
-async def holidays(
-    year: int = Query(..., ge=1900, le=2100),
-    authorization: str = Header(...),
-) -> HolidaysResponse:
-    """Retrieve holidays for a given year."""
-    try:
-        return await client.get_holidays(year, authorization)
-    except httpx.HTTPError as exc:
-        raise HTTPException(status_code=502, detail=str(exc)) from exc
-
-
-@app.get("/leaves", response_model=LeavesResponse)
-async def leaves(
-    fy_id: str = Query(..., alias="fyId"),
-    authorization: str = Header(...),
-) -> LeavesResponse:
-    """Retrieve leave entries for the provided financial year identifier."""
-    try:
-        return await client.get_leaves(fy_id, authorization)
-    except httpx.HTTPError as exc:
-        raise HTTPException(status_code=502, detail=str(exc)) from exc
-
-
-@app.post("/leaves/apply", response_model=ApplyLeaveResponse)
-async def apply_leave(
-    body: ApplyLeaveRequest, authorization: str = Header(...)
-) -> ApplyLeaveResponse:
-    """Apply for a leave or comp-off."""
-    try:
-        return await client.apply_leave(body, authorization)
-    except httpx.HTTPError as exc:
-        raise HTTPException(status_code=502, detail=str(exc)) from exc
+# Placeholder routers for future expansion
+app.include_router(attendance_router)
+app.include_router(feedback_router)
+app.include_router(tickets_router)
+app.include_router(team_management_router)

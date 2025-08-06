@@ -4,14 +4,14 @@ import pytest
 from fastapi.testclient import TestClient
 
 from mcp_server.main import app, client as hrms_client
-from mcp_server.models import (
+from mcp_server.leaves.models import (
     ApplyLeaveData,
     ApplyLeaveRequest,
     ApplyLeaveResponse,
     Holiday,
     HolidaysResponse,
 )
-from mcp_server.tools import create_hrms_tools
+from mcp_server.tools import create_langchain_tools
 
 
 @pytest.fixture
@@ -22,7 +22,7 @@ def http_client():
 
 @pytest.fixture
 def tools(http_client):
-    return create_hrms_tools(
+    return create_langchain_tools(
         "http://testserver", lambda: "Bearer token", client=http_client
     )
 

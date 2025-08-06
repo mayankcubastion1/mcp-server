@@ -10,8 +10,8 @@ from .models import (
 )
 
 
-class HRMSClient:
-    """Client for interacting with the HRMS portal API."""
+class LeavesClient:
+    """Client for interacting with leave‑related HRMS APIs."""
 
     def __init__(
         self, base_url: str | None = None, timeout: float = 10.0
