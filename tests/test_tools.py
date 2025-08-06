@@ -2,6 +2,7 @@ from datetime import date, datetime
 
 import pytest
 from fastapi.testclient import TestClient
+from pydantic import BaseModel
 
 from mcp_server.main import app, client as hrms_client
 from mcp_server.leaves.models import (
@@ -13,7 +14,7 @@ from mcp_server.leaves.models import (
 )
 from mcp_server.attendance.models import AttendanceEntry, AttendanceResponse, Paginate
 from mcp_server.attendance.router import client as attendance_client
-from mcp_server.tools import create_langchain_tools
+from mcp_server.tools import create_langchain_tools, create_tool_specs
 
 
 @pytest.fixture
@@ -127,3 +128,12 @@ def test_get_attendance_tool(mock_get_attendance, tools):
     result = attendance_tool.invoke({"year": 2025, "month": 5})
     assert result["statusCode"] == 200
     assert result["data"][0]["Id"] == "1"
+
+
+def test_tool_specs_have_schema_and_description(http_client):
+    specs = create_tool_specs(
+        "http://testserver", lambda: "Bearer token", client=http_client
+    )
+    for spec in specs:
+        assert spec.description, f"{spec.name} missing description"
+        assert issubclass(spec.args_schema, BaseModel), f"{spec.name} missing args schema"
