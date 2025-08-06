@@ -8,6 +8,10 @@ This repository contains a [Model Context Protocol (MCP)] server exposing select
 - **Holiday data** proxy at `/holidays?year=YYYY` forwarding to the HRMS `app/employees/holidays` API.
 - **Leave records** proxy at `/leaves?fyId=<financial_year_id>` forwarding to the HRMS `attendance/leaves/my-leaves` API.
 - **Apply leave** proxy at `/leaves/apply` forwarding POST requests to the HRMS `attendance/leaves/apply` API.
+- **Attendance** proxy at `/attendance/my-attendance`.
+- **Feedback** endpoints for adding feedback, viewing RM feedbacks and listing levels.
+- **Ticket management** endpoints for viewing, drafting and submitting tickets.
+- **Team management** ledger endpoint at `/team-management/ledger`.
 - All HRMS calls transparently forward the incoming `Authorization: Bearer <token>` header.
 - Built with [FastAPI](https://fastapi.tiangolo.com/) and packaged using Docker.
 
@@ -120,7 +124,8 @@ tools = create_langchain_tools(
     auth_header_getter=lambda: "Bearer <token>",
 )
 
-# tools now contains StructuredTool instances: get_holidays, get_leaves and apply_leave
+# tools now contains StructuredTool instances for all available endpoints
+# (e.g. get_holidays, get_leaves, apply_leave, get_attendance, add_feedback, get_tickets, ...)
 ```
 
 Each specification returns the JSON response from the corresponding MCP
