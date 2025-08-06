@@ -7,6 +7,7 @@ This repository contains a [Model Context Protocol (MCP)] server exposing select
 - **Health check** endpoint at `/health`.
 - **Holiday data** proxy at `/holidays?year=YYYY` forwarding to the HRMS `app/employees/holidays` API.
 - **Leave records** proxy at `/leaves?fyId=<financial_year_id>` forwarding to the HRMS `attendance/leaves/my-leaves` API.
+- **Apply leave** proxy at `/leaves/apply` forwarding POST requests to the HRMS `attendance/leaves/apply` API.
 - Built with [FastAPI](https://fastapi.tiangolo.com/) and packaged using Docker.
 
 ## Configuration
@@ -32,11 +33,21 @@ Example requests:
 ```bash
 curl 'http://localhost:8000/holidays?year=2025'
 curl 'http://localhost:8000/leaves?fyId=roxq0g78pis7ia9'
+curl -X POST 'http://localhost:8000/leaves/apply' \
+  -H 'Content-Type: application/json' \
+  -d '{"type":"Debit","category":"Leave","leaveCount":2,"leaveDate":"2025-08-24","comments":"Not feeling well","status":"Pending Approval"}'
 ```
 
 ## Testing
 
-Execute the test suite with:
+The repository includes unit tests under `tests/`:
+
+- `test_health.py`
+- `test_holidays.py`
+- `test_leaves.py`
+- `test_apply_leave.py`
+
+Run all tests with:
 
 ```bash
 pytest
