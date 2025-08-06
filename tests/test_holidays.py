@@ -3,8 +3,9 @@ from datetime import date
 from fastapi.testclient import TestClient
 import pytest
 
-from mcp_server.main import app, client as hrms_client
-from mcp_server.models import Holiday, HolidaysResponse
+from mcp_server.main import app
+from mcp_server.leaves import api as leaves_api
+from mcp_server.leaves.models import Holiday, HolidaysResponse
 
 client = TestClient(app)
 
@@ -23,7 +24,7 @@ def mock_get_holidays(monkeypatch):
     async def _mock(year: int, auth_header: str) -> HolidaysResponse:
         return sample
 
-    monkeypatch.setattr(hrms_client, "get_holidays", _mock)
+    monkeypatch.setattr(leaves_api.client, "get_holidays", _mock)
 
 
 def test_holidays_endpoint(mock_get_holidays):

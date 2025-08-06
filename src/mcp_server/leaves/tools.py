@@ -1,6 +1,13 @@
 from __future__ import annotations
 
-"""LangChain tools for interacting with the MCP server endpoints."""
+"""Utilities for calling leave-related MCP endpoints.
+
+This module exposes plain Python callables that can be used by any agentic AI
+framework.  It also provides helper functions to convert them into LangChain
+`StructuredTool` instances for backwards compatibility.  ``StructuredTool`` is
+being deprecated in the LangChain ecosystem, but we keep it here as an example
+and for frameworks that still rely on it.
+"""
 
 from typing import Callable, List, Optional
 
@@ -23,27 +30,16 @@ class LeavesInput(BaseModel):
     fyId: str = Field(..., description="Financial year identifier")
 
 
-def create_hrms_tools(
+def create_callables(
     base_url: str,
     auth_header_getter: Callable[[], str],
     client: Optional[httpx.Client] = None,
-) -> List[StructuredTool]:
-    """Create LangChain tools wrapping the MCP server endpoints.
-
-    Parameters
-    ----------
-    base_url:
-        Base URL of the running MCP server (e.g. ``"http://localhost:8000"``).
-    auth_header_getter:
-        Callable that returns the value for the ``Authorization`` header.
-    client:
-        Optional ``httpx.Client`` instance.  If omitted, a new client will be
-        created using the given ``base_url``.
-    """
+) -> List[Callable]:
+    """Return simple callables for each leave-related endpoint."""
 
     http_client = client or httpx.Client(base_url=base_url)
 
-    def _get_holidays(year: int) -> dict:
+    def get_holidays(year: int) -> dict:
         """Fetch holidays for the provided year."""
 
         response = http_client.get(
@@ -54,7 +50,7 @@ def create_hrms_tools(
         response.raise_for_status()
         return response.json()
 
-    def _get_leaves(fyId: str) -> dict:
+    def get_leaves(fyId: str) -> dict:
         """Fetch leave records for the given financial year id."""
 
         response = http_client.get(
@@ -65,7 +61,7 @@ def create_hrms_tools(
         response.raise_for_status()
         return response.json()
 
-    def _apply_leave(**payload: dict) -> dict:
+    def apply_leave(**payload: dict) -> dict:
         """Apply for a leave or comp-off."""
 
         req = ApplyLeaveRequest(**payload)
@@ -77,22 +73,35 @@ def create_hrms_tools(
         response.raise_for_status()
         return response.json()
 
+    return [get_holidays, get_leaves, apply_leave]
+
+
+def create_structured_tools(
+    base_url: str,
+    auth_header_getter: Callable[[], str],
+    client: Optional[httpx.Client] = None,
+) -> List[StructuredTool]:
+    """Create LangChain ``StructuredTool`` objects for the leave callables."""
+
+    callables = create_callables(base_url, auth_header_getter, client)
+    get_holidays, get_leaves, apply_leave = callables
+
     holidays_tool = StructuredTool.from_function(
-        func=_get_holidays,
+        func=get_holidays,
         name="get_holidays",
         description="Fetch holidays for the provided year.",
         args_schema=HolidaysInput,
     )
 
     leaves_tool = StructuredTool.from_function(
-        func=_get_leaves,
+        func=get_leaves,
         name="get_leaves",
         description="Fetch leave records for a financial year.",
         args_schema=LeavesInput,
     )
 
     apply_leave_tool = StructuredTool.from_function(
-        func=_apply_leave,
+        func=apply_leave,
         name="apply_leave",
         description="Apply for a leave or comp-off.",
         args_schema=ApplyLeaveRequest,

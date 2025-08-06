@@ -3,15 +3,16 @@ from datetime import date, datetime
 import pytest
 from fastapi.testclient import TestClient
 
-from mcp_server.main import app, client as hrms_client
-from mcp_server.models import (
+from mcp_server.main import app
+from mcp_server.leaves import api as leaves_api
+from mcp_server.leaves.models import (
     ApplyLeaveData,
     ApplyLeaveRequest,
     ApplyLeaveResponse,
     Holiday,
     HolidaysResponse,
 )
-from mcp_server.tools import create_hrms_tools
+from mcp_server.leaves.tools import create_structured_tools
 
 
 @pytest.fixture
@@ -22,7 +23,7 @@ def http_client():
 
 @pytest.fixture
 def tools(http_client):
-    return create_hrms_tools(
+    return create_structured_tools(
         "http://testserver", lambda: "Bearer token", client=http_client
     )
 
@@ -41,7 +42,7 @@ def mock_get_holidays(monkeypatch):
     async def _mock(year: int, auth_header: str) -> HolidaysResponse:
         return sample
 
-    monkeypatch.setattr(hrms_client, "get_holidays", _mock)
+    monkeypatch.setattr(leaves_api.client, "get_holidays", _mock)
 
 
 @pytest.fixture
@@ -68,7 +69,7 @@ def mock_apply_leave(monkeypatch):
     async def _mock(payload: ApplyLeaveRequest, auth_header: str) -> ApplyLeaveResponse:
         return sample
 
-    monkeypatch.setattr(hrms_client, "apply_leave", _mock)
+    monkeypatch.setattr(leaves_api.client, "apply_leave", _mock)
 
 
 def test_get_holidays_tool(mock_get_holidays, tools):

@@ -3,8 +3,9 @@ from datetime import date, datetime
 from fastapi.testclient import TestClient
 import pytest
 
-from mcp_server.main import app, client as hrms_client
-from mcp_server.models import LeaveEntry, LeavesResponse
+from mcp_server.main import app
+from mcp_server.leaves import api as leaves_api
+from mcp_server.leaves.models import LeaveEntry, LeavesResponse
 
 client = TestClient(app)
 
@@ -39,7 +40,7 @@ def mock_get_leaves(monkeypatch):
     async def _mock(fy_id: str, auth_header: str) -> LeavesResponse:
         return sample
 
-    monkeypatch.setattr(hrms_client, "get_leaves", _mock)
+    monkeypatch.setattr(leaves_api.client, "get_leaves", _mock)
 
 
 def test_leaves_endpoint(mock_get_leaves):

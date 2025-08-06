@@ -75,32 +75,49 @@ docker run -p 8000:8000 mcp-server
 
 The service will be available at `http://localhost:8000`.
 
-## Adding new APIs
+## Project structure
 
-1. **Define Pydantic models** in `models.py` describing the request and response bodies.
-2. **Add a client method** in `hrms_client.py` that calls the HRMS endpoint, accepts an `auth_header` argument, and returns the typed models.
-3. **Create a route** in `main.py` that accepts the necessary parameters, requires the `Authorization` header, and calls the client method.
-4. **Document the endpoint** in this README and add a corresponding test under `tests/` that patches the new client method.
+APIs and tools are organised by domain under the `mcp_server` package.  At the
+moment only the **leaves** APIs are implemented, but empty packages exist for
+future `feedback`, `tickets`, `attendance`, `misc` and `team_management`
+domains.  Each domain contains its own models, FastAPI routes and optional tool
+wrappers.
+
+To add a new endpoint to a domain:
+
+1. **Define Pydantic models** in the domain's `models.py`.
+2. **Add client logic** in `client.py` for calling the upstream HRMS API.
+3. **Expose the endpoint** via an `APIRouter` in `api.py` and include the router
+   in `main.py`.
+4. **Document the endpoint** in this README and add a corresponding test under
+   `tests/` that patches the new client method.
 5. **Run `pytest`** before committing to verify everything works.
 
-Following this pattern allows the MCP server to expand as additional HRMS APIs are exposed.
+## Using from agent frameworks
 
-## Using from LangChain
-
-The module `mcp_server.tools` exposes a helper to register the MCP endpoints as
-LangChain tools.  These tools can be used by a LangChain agent or a LangGraph
-workflow so an LLM can call the HRMS APIs directly:
+The leaves package provides generic callables as well as LangChain-compatible
+wrappers so you can use these APIs from any agent framework including
+LangGraph and future LangChain releases:
 
 ```python
-from mcp_server.tools import create_hrms_tools
+from mcp_server.leaves.tools import (
+    create_callables,
+    create_structured_tools,
+)
 
-tools = create_hrms_tools(
+# Framework-agnostic Python callables
+funcs = create_callables(
     base_url="http://localhost:8000",
     auth_header_getter=lambda: "Bearer <token>",
 )
 
-# tools now contains StructuredTool instances: get_holidays, get_leaves and apply_leave
+# Optional: deprecated LangChain StructuredTool wrappers
+structured_tools = create_structured_tools(
+    base_url="http://localhost:8000",
+    auth_header_getter=lambda: "Bearer <token>",
+)
 ```
 
-Each tool returns the JSON response from the corresponding MCP endpoint and can
-be supplied to any LangChain agent that supports structured tool calling.
+`StructuredTool` is being deprecated in the LangChain ecosystem, but it remains
+available here for backwards compatibility.  The simple callables can be
+wrapped by any agentic AI framework.
