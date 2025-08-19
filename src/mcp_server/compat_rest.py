@@ -3,6 +3,7 @@ from fastapi import APIRouter, Body, HTTPException, Request
 from typing import Any, Dict, List
 from pydantic import BaseModel
 import os
+import httpx
 from .tool_registry import all_tool_specs
 from .auth_context import set_request_headers, auth_header_getter
 
@@ -46,4 +47,19 @@ def call_tool(body: CallBody = Body(...), request: Request = None):
     args = body.arguments or {}
     if getattr(spec, "args_schema", None):
         args = spec.args_schema(**args).model_dump()
-    return {"result": spec.func(**args)}
+    try:
+        return {"result": spec.func(**args)}
+    except httpx.HTTPStatusError as exc:
+        detail: Any = exc.response.text
+        try:
+            data = exc.response.json()
+        except ValueError:
+            pass
+        else:
+            if isinstance(data, dict) and "detail" in data:
+                detail = data["detail"]
+            else:
+                detail = data
+        raise HTTPException(status_code=exc.response.status_code, detail=detail) from exc
+    except httpx.HTTPError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
