@@ -5,6 +5,10 @@ from pydantic import BaseModel, Field
 from langchain_core.tools import StructuredTool
 from ..tools.base import ToolSpec
 
+class AttendanceInput(BaseModel):
+    year: int
+    month: int
+
 class AttendanceDateInput(BaseModel):
     attendanceDate: str
 
@@ -38,6 +42,15 @@ def create_tool_specs(
     client: Optional[httpx.Client] = None,
 ) -> List[ToolSpec]:
     http_client = client or httpx.Client(base_url=base_url, timeout=20.0)
+
+    def _get_attendance(year: int, month: int) -> dict:
+        r = http_client.post(
+            "/attendance/my-attendance",
+            params={"year": year, "month": month},
+            headers={"Authorization": auth_header_getter()},
+        )
+        r.raise_for_status()
+        return r.json()
 
     def _get_attendance_date(attendanceDate: str) -> dict:
         r = http_client.get(
@@ -91,6 +104,7 @@ def create_tool_specs(
         return r.json()
 
     return [
+        ToolSpec("get_attendance", "Get attendance entries for a month.", AttendanceInput, _get_attendance),
         ToolSpec("get_attendance_date", "Get iPad-marked timings for a date.", AttendanceDateInput, _get_attendance_date),
         ToolSpec("list_arrs", "List attendance regularization requests (ARRs).", ArrListInput, _list_arrs),
         ToolSpec("submit_arr", "Submit an ARR (supports file).", SubmitArrInput, _submit_arr),

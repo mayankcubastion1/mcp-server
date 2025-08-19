@@ -3,11 +3,23 @@
 from fastapi import APIRouter, Header, HTTPException, Query, UploadFile, File, Form, Body
 import httpx
 from .client import AttendanceClient
+from .models import AttendanceResponse
 
-router = APIRouter(prefix="/api/v2/attendance")
+router = APIRouter(tags=["attendance"])
 client = AttendanceClient()
 
-@router.get("/attendances/employee/attendance-date")
+@router.post("/attendance/my-attendance", response_model=AttendanceResponse)
+async def my_attendance(
+    year: int = Query(..., ge=1900, le=2100),
+    month: int = Query(..., ge=1, le=12),
+    authorization: str = Header(...),
+) -> AttendanceResponse:
+    try:
+        return await client.get_my_attendance(year, month, authorization)
+    except httpx.HTTPError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+@router.get("/api/v2/attendance/attendances/employee/attendance-date")
 async def attendance_date(
     attendanceDate: str = Query(...),
     authorization: str = Header(...),
@@ -17,7 +29,7 @@ async def attendance_date(
     except httpx.HTTPError as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc
 
-@router.get("/attendances/my-regularized-attendance")
+@router.get("/api/v2/attendance/attendances/my-regularized-attendance")
 async def my_regularized_attendance(
     year: int = Query(..., ge=1900, le=2100),
     month: int = Query(..., ge=1, le=12),
@@ -29,7 +41,7 @@ async def my_regularized_attendance(
     except httpx.HTTPError as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc
 
-@router.post("/attendances/regularisation/project")
+@router.post("/api/v2/attendance/attendances/regularisation/project")
 async def submit_arr(
     employeeId: str = Query(..., description="HRMS employee Id, as 'Id' query for HRMS"),
     attendanceDate: str = Form(...),
@@ -68,7 +80,7 @@ async def submit_arr(
     except httpx.HTTPError as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc
 
-@router.post("/leaves/apply")
+@router.post("/api/v2/attendance/leaves/apply")
 async def apply_leave(
     body: dict = Body(...),
     authorization: str = Header(...),

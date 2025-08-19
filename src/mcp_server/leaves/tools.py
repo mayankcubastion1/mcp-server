@@ -58,8 +58,8 @@ def create_tool_specs(
     Create framework-agnostic tool specifications for leave APIs.
     IMPORTANT: Point the base to /leaves so tools can call "/holidays" etc. without 404.
     """
-    # Ensure base ends with /leaves for these endpoints
-    leaves_base = f"{base_url.rstrip('/')}/leaves"
+    # Bind to the API root so requests hit /holidays, /leaves, /leaves/apply
+    leaves_base = base_url.rstrip("/")
     http_client = client or httpx.Client(base_url=leaves_base, timeout=30.0)
 
     def _get_holidays(year: int) -> dict:

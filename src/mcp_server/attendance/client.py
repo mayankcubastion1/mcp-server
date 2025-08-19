@@ -10,6 +10,17 @@ class AttendanceClient:
             raise RuntimeError("HRMS_API_BASE_URL is not configured")
         self.timeout = timeout
 
+    async def get_my_attendance(self, year: int, month: int, auth_header: str) -> dict:
+        params = {"year": year, "month": month}
+        async with httpx.AsyncClient(timeout=self.timeout) as client:
+            r = await client.post(
+                f"{self.base_url}/attendance/my-attendance",
+                params=params,
+                headers={"Authorization": auth_header},
+            )
+            r.raise_for_status()
+            return r.json()
+
     async def get_attendance_date(self, attendance_date: str, auth_header: str) -> dict:
         params = {"attendanceDate": attendance_date}
         async with httpx.AsyncClient(timeout=self.timeout) as client:

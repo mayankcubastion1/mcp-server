@@ -8,11 +8,12 @@ from .models import (
     HolidaysResponse,
     LeavesResponse,
 )
-import os, httpx
-PROXY_BASE = os.getenv("SERVER_EXTERNAL_BASE_URL", "http://localhost:8000").rstrip("/")
-client = httpx.Client(base_url=f"{PROXY_BASE}/leaves", timeout=30.0)
 
-router = APIRouter(prefix="/leaves", tags=["leaves"])
+# Single client used by the FastAPI routes; tests patch methods on this instance.
+client = LeavesClient()
+
+# Endpoints live at the API root: /holidays, /leaves, /leaves/apply
+router = APIRouter(tags=["leaves"])
 
 @router.get("/holidays", response_model=HolidaysResponse)
 async def holidays(
@@ -40,7 +41,8 @@ async def leaves(
 
 @router.post("/leaves/apply", response_model=ApplyLeaveResponse)
 async def apply_leave(
-    body: ApplyLeaveRequest, authorization: str = Header(...)
+    body: ApplyLeaveRequest,
+    authorization: str = Header(...),
 ) -> ApplyLeaveResponse:
     """Apply for a leave or comp-off."""
     try:
@@ -51,7 +53,8 @@ async def apply_leave(
 
 @router.post("/leaves/apply/comp-off", response_model=ApplyLeaveResponse)
 async def apply_comp_off(
-    body: ApplyLeaveRequest, authorization: str = Header(...)
+    body: ApplyLeaveRequest,
+    authorization: str = Header(...),
 ) -> ApplyLeaveResponse:
     """Apply for a comp-off credit."""
     try:
