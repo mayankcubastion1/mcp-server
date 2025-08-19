@@ -1,22 +1,40 @@
-from fastapi import FastAPI
-from dotenv import load_dotenv
-from .attendance.router import router as attendance_router
-from .feedback.router import router as feedback_router
-from .leaves.router import router as leaves_router, client as client
-from .miscellaneous.router import router as misc_router
-from .tickets.router import router as tickets_router
-from .team_management.router import router as team_management_router
+# src/mcp_server/main.py
+from fastapi import FastAPI, Request
+from .mcp_runtime import build_mcp_server
+from .auth_context import set_request_headers
+from .compat_rest import router as compat_router
+from .leaves.router import router as leaves_router  # 🔴 add this (and other domain routers later)
 
-app = FastAPI(title="MCP Server")
+app = FastAPI(title="XAgent HR MCP Host")
 
-load_dotenv()
+# Put headers into a contextvar so tools (or compat) can read them
+@app.middleware("http")
+async def _stash_headers(request: Request, call_next):
+    # capture for both /mcp (real MCP) and /mcp-compat (Postman/curl shim)
+    if request.url.path.startswith("/mcp") or request.url.path.startswith("/mcp-compat"):
+        set_request_headers(dict(request.headers))
+    return await call_next(request)
 
-# Core routes
-app.include_router(misc_router)
+# Mount MCP server (streamable HTTP → HTTP → SSE)
+mcp = build_mcp_server()
+mounted = False
+for method in ("streamable_http_app", "http_app", "sse_app"):
+    mount = getattr(mcp, method, None)
+    if callable(mount):
+        app.mount("/mcp", mount())
+        print(f"[mcp] Mounted {method} at /mcp")
+        mounted = True
+        break
+if not mounted:
+    raise RuntimeError("FastMCP has no HTTP/SSE mount; upgrade `mcp` package.")
+
+# 🔴 Register domain routers so endpoints like /leaves/holidays exist
 app.include_router(leaves_router)
 
-# Placeholder routers for future expansion
-app.include_router(attendance_router)
-app.include_router(feedback_router)
-app.include_router(tickets_router)
-app.include_router(team_management_router)
+# Optional REST shim for Postman/curl sanity checks
+app.include_router(compat_router)
+
+# Optional: a quick health route
+@app.get("/health")
+def health():
+    return {"ok": True}

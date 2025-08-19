@@ -8,9 +8,11 @@ from .models import (
     HolidaysResponse,
     LeavesResponse,
 )
+import os, httpx
+PROXY_BASE = os.getenv("SERVER_EXTERNAL_BASE_URL", "http://localhost:8000").rstrip("/")
+client = httpx.Client(base_url=f"{PROXY_BASE}/leaves", timeout=30.0)
 
-router = APIRouter()
-client = LeavesClient()
+router = APIRouter(prefix="/leaves", tags=["leaves"])
 
 @router.get("/holidays", response_model=HolidaysResponse)
 async def holidays(
