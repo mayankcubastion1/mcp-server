@@ -92,6 +92,20 @@ def create_tool_specs(
         )
         response.raise_for_status()
         return response.json()
+    
+    def _apply_comp_off(**payload: dict) -> dict:
+        """
+        Apply for a comp-off credit via the MCP server.
+        Uses the same schema as ApplyLeaveRequest.
+        """
+        req = ApplyLeaveRequest(**payload)
+        r = http_client.post(
+            "/leaves/apply/comp-off",
+            json=req.model_dump(mode="json"),
+            headers={"Authorization": auth_header_getter()},
+        )
+        r.raise_for_status()
+        return r.json()
 
     return [
         ToolSpec(
@@ -111,6 +125,12 @@ def create_tool_specs(
             description="Apply for a leave or comp-off.",
             args_schema=ApplyLeaveRequest,
             func=_apply_leave,
+        ),
+        ToolSpec(
+            name="apply_comp_off",
+            description="Apply for a comp-off credit (category='Comp-Off').",
+            args_schema=ApplyLeaveRequest,
+            func=_apply_comp_off,
         ),
     ]
 
