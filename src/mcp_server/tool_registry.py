@@ -2,15 +2,15 @@
 from typing import Callable, List, Optional
 import httpx
 
-from .leaves.tools import create_tool_specs as _leaves
-from .attendance.tools import create_tool_specs as _attendance
-from .feedback.tools import create_tool_specs as _feedback
-from .tickets.tools import create_tool_specs as _tickets
-from .team_management.tools import create_tool_specs as _team
-from .miscellaneous.tools import create_tool_specs as _misc
+from .tools.leaves.tools import create_tool_specs as _leaves
+from .tools.attendance.tools import create_tool_specs as _attendance
+from .tools.feedback.tools import create_tool_specs as _feedback
+from .tools.tickets.tools import create_tool_specs as _tickets
+from .tools.team_management.tools import create_tool_specs as _team
+from .tools.miscellaneous.tools import create_tool_specs as _misc
 
 try:
-    from .referrals.tools import create_tool_specs as _referrals
+    from .tools.referrals.tools import create_tool_specs as _referrals
 except Exception:
     _referrals = None
 

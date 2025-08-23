@@ -14,7 +14,7 @@ def build_mcp_server() -> FastMCP:
         return "pong"
 
     # Where your tools should call (usually your own FastAPI, not HRMS directly)
-    base_url = os.getenv("SERVER_EXTERNAL_BASE_URL", "http://localhost:8000").rstrip("/")
+    base_url = ("http://localhost:8000").rstrip("/")
 
     specs = list(all_tool_specs(base_url, auth_header_getter))
     print(f"[mcp] Registering {len(specs)} ToolSpecs…")

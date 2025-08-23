@@ -3,13 +3,13 @@ from fastapi import FastAPI, Request
 from .mcp_runtime import build_mcp_server
 from .auth_context import set_request_headers
 from .compat_rest import router as compat_router
-from .leaves.router import router as leaves_router, client as leaves_client
-from .attendance.router import router as attendance_router, client as attendance_client
-from .feedback.router import router as feedback_router, client as feedback_client
-from .tickets.router import router as tickets_router, client as tickets_client
-from .team_management.router import router as team_router, client as team_client
-from .miscellaneous.router import router as misc_router, client as misc_client
-from .referrals.router import router as referrals_router, client as referrals_client
+from .tools.leaves.router import router as leaves_router, client as leaves_client
+from .tools.attendance.router import router as attendance_router, client as attendance_client
+from .tools.feedback.router import router as feedback_router, client as feedback_client
+from .tools.tickets.router import router as tickets_router, client as tickets_client
+from .tools.team_management.router import router as team_router, client as team_client
+from .tools.miscellaneous.router import router as misc_router, client as misc_client
+from .tools.referrals.router import router as referrals_router, client as referrals_client
 
 app = FastAPI(title="XAgent HR MCP Host")
 

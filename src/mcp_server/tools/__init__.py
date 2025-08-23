@@ -6,12 +6,12 @@ import httpx
 from langchain_core.tools import StructuredTool
 
 from .base import ToolSpec
-from ..attendance import tools as attendance_tools
-from ..feedback import tools as feedback_tools
-from ..leaves import tools as leaves_tools
-from ..miscellaneous import tools as misc_tools
-from ..team_management import tools as team_tools
-from ..tickets import tools as tickets_tools
+from ..tools.attendance import tools as attendance_tools
+from ..tools.feedback import tools as feedback_tools
+from ..tools.leaves import tools as leaves_tools
+from ..tools.miscellaneous import tools as misc_tools
+from ..tools.team_management import tools as team_tools
+from ..tools.tickets import tools as tickets_tools
 
 
 def create_tool_specs(

@@ -8,9 +8,9 @@ client = TestClient(app)
 
 @pytest.fixture(autouse=True)
 def set_base_url(monkeypatch):
-    monkeypatch.setenv("SERVER_EXTERNAL_BASE_URL", "http://testserver")
+    monkeypatch.setenv("http://localhost:8000", "http://testserver")
     # Use the in-process FastAPI app for HTTP requests
-    monkeypatch.setattr("mcp_server.leaves.tools.httpx.Client", lambda *args, **kwargs: client)
+    monkeypatch.setattr("mcp_server.tools.leaves.tools.httpx.Client", lambda *args, **kwargs: client)
 
 
 @pytest.fixture
