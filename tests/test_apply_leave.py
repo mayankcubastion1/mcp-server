@@ -60,3 +60,46 @@ def test_apply_leave_endpoint(mock_apply_leave):
     body = response.json()
     assert body["data"]["category"] == "Leave"
     assert body["statusMessage"] == "Document created successfully"
+
+
+def test_apply_leave_defaults(monkeypatch):
+    sample = ApplyLeaveResponse(
+        statusCode=200,
+        statusMessage="Document created successfully",
+        data=ApplyLeaveData(
+            id="123",
+            leaveDate=date(2025, 8, 24),
+            leaveCount=1.0,
+            comments="personal work",
+            category="Leave",
+            type="Debit",
+            status="Pending Approval",
+            employeeFinancialYearId="fy1",
+            employeeId="emp1",
+            appliedDate=date(2025, 8, 6),
+            updatedAt=datetime(2025, 8, 6, 10, 0, 0),
+            createdAt=datetime(2025, 8, 6, 10, 0, 0),
+        ),
+    )
+
+    captured: dict = {}
+
+    async def _mock(payload: ApplyLeaveRequest, auth_header: str) -> ApplyLeaveResponse:
+        captured["payload"] = payload
+        return sample
+
+    monkeypatch.setattr(hrms_client, "apply_leave", _mock)
+
+    minimal_payload = {
+        "leaveCount": 1.0,
+        "leaveDate": "2025-08-24",
+        "comments": "personal work",
+    }
+    response = client.post(
+        "/leaves/apply",
+        json=minimal_payload,
+        headers={"Authorization": "Bearer token"},
+    )
+    assert response.status_code == 200
+    assert captured["payload"].category == "Debit"
+    assert captured["payload"].status == "Pending Approval"
