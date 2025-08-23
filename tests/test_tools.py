@@ -68,10 +68,15 @@ def mock_apply_leave(monkeypatch):
         ),
     )
 
+    captured: dict = {}
+
     async def _mock(payload: ApplyLeaveRequest, auth_header: str) -> ApplyLeaveResponse:
+        captured["payload"] = payload
         return sample
 
     monkeypatch.setattr(hrms_client, "apply_leave", _mock)
+
+    return captured
 
 
 def test_get_holidays_tool(mock_get_holidays, tools):
@@ -94,6 +99,19 @@ def test_apply_leave_tool(mock_apply_leave, tools):
     result = apply_tool.invoke(payload)
     assert result["statusMessage"] == "Document created successfully"
     assert result["data"]["category"] == "Leave"
+
+
+def test_apply_leave_tool_defaults(mock_apply_leave, tools):
+    apply_tool = next(t for t in tools if t.name == "apply_leave")
+    payload = {
+        "leaveCount": 1.0,
+        "leaveDate": "2025-08-24",
+        "comments": "personal work",
+    }
+    result = apply_tool.invoke(payload)
+    assert result["statusMessage"] == "Document created successfully"
+    assert mock_apply_leave["payload"].category == "Debit"
+    assert mock_apply_leave["payload"].status == "Pending Approval"
 
 
 @pytest.fixture

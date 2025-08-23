@@ -1,5 +1,5 @@
 from datetime import date, datetime
-from typing import List, Optional
+from typing import List, Optional, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -54,24 +54,29 @@ class LeavesResponse(BaseModel):
 
 class ApplyLeaveRequest(BaseModel):
     """Payload for applying a leave or comp-off."""
+    model_config = ConfigDict(extra="forbid")
 
-    type: str = Field(
-        ..., description="Transaction type such as 'Debit' when applying leave"
+    # Defaults to "Debit" and only allows "Debit" for regular leave
+    type: Literal["Debit"] = Field(
+        "Debit",
+        description="Transaction type (always 'Debit' when applying a leave)",
     )
     category: str = Field(
-        ..., description="Leave category like 'Leave' or 'Comp-Off'"
+        "Debit",
+        description="Leave category (defaults to 'Debit' if omitted)",
     )
     leaveCount: float = Field(
-        ..., description="Number of leave days or comp-off units being requested"
+        ..., description="Number of leave days or comp-off units being requested",
     )
     leaveDate: date = Field(
-        ..., description="Date for the requested leave in YYYY-MM-DD format"
+        ..., description="Date for the requested leave in YYYY-MM-DD format",
     )
-    comments: str = Field(
-        ..., description="Optional explanation or reason for the leave"
+    comments: Optional[str] = Field(
+        None, description="Optional explanation or reason for the leave",
     )
     status: str = Field(
-        ..., description="Initial application status, e.g. 'Pending Approval'"
+        "Pending Approval",
+        description="Initial application status (defaults to 'Pending Approval')",
     )
 
 
@@ -99,4 +104,5 @@ class ApplyLeaveResponse(BaseModel):
 
     statusCode: int
     statusMessage: str
-    data: ApplyLeaveData
+    data: Optional[ApplyLeaveData] = None
+    error: Optional[str] = None
