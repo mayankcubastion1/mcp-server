@@ -8,8 +8,12 @@ import httpx
 from langchain_core.tools import StructuredTool
 from pydantic import BaseModel, Field
 
-from mcp_server.tools.base import ToolSpec
-from .models import ApplyLeaveRequest, ApplyCompOffRequest
+import mcp_server.tools.base as tools_base
+import mcp_server.tools.leaves.models as leaves_models
+
+ToolSpec = tools_base.ToolSpec
+ApplyLeaveRequest = leaves_models.ApplyLeaveRequest
+ApplyCompOffRequest = leaves_models.ApplyCompOffRequest
 
 
 # ---- Input models for tools in this module ----

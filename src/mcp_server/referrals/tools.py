@@ -4,7 +4,9 @@ from typing import Callable, List, Optional, Dict, Any
 import httpx
 from pydantic import BaseModel, Field
 from langchain_core.tools import StructuredTool
-from ..tools.base import ToolSpec
+import mcp_server.tools.base as tools_base
+
+ToolSpec = tools_base.ToolSpec
 
 class OpeningsToolInput(BaseModel):
     page: int = 1

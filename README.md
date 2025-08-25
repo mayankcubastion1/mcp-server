@@ -28,7 +28,7 @@ Every request to the MCP server **must** include a valid `Authorization` header 
 Install dependencies:
 
 ```bash
-pip install -r requirements.txt
+pip install -e .[dev]
 ```
 
 Run the application locally:

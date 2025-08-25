@@ -2,17 +2,25 @@
 from typing import Callable, List, Optional
 import httpx
 
-from .tools.leaves.tools import create_tool_specs as _leaves
-from .tools.attendance.tools import create_tool_specs as _attendance
-from .tools.feedback.tools import create_tool_specs as _feedback
-from .tools.tickets.tools import create_tool_specs as _tickets
-from .tools.team_management.tools import create_tool_specs as _team
-from .tools.miscellaneous.tools import create_tool_specs as _misc
+import mcp_server.tools.leaves.tools as leaves_tools
+import mcp_server.tools.attendance.tools as attendance_tools
+import mcp_server.tools.feedback.tools as feedback_tools
+import mcp_server.tools.tickets.tools as tickets_tools
+import mcp_server.tools.team_management.tools as team_tools
+import mcp_server.tools.miscellaneous.tools as misc_tools
 
 try:
-    from .tools.referrals.tools import create_tool_specs as _referrals
+    import mcp_server.tools.referrals.tools as referrals_tools
 except Exception:
-    _referrals = None
+    referrals_tools = None
+
+_leaves = leaves_tools.create_tool_specs
+_attendance = attendance_tools.create_tool_specs
+_feedback = feedback_tools.create_tool_specs
+_tickets = tickets_tools.create_tool_specs
+_team = team_tools.create_tool_specs
+_misc = misc_tools.create_tool_specs
+_referrals = referrals_tools.create_tool_specs if referrals_tools else None
 
 def all_tool_specs(base_url: str, auth_header_getter: Callable[[], str], http_client: Optional[httpx.Client] = None):
     specs = []
