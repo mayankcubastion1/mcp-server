@@ -79,6 +79,40 @@ docker run -p 8000:8000 mcp-server
 
 The service will be available at `http://localhost:8000`.
 
+## Packaging and Distribution
+
+The project includes a `pyproject.toml` that declares the MCP server as a
+standard Python package using the Hatchling build backend. All runtime
+dependencies and optional development tools are listed there, which allows the
+application to be installed or built in a consistent way.
+
+### Benefits
+
+- Unified metadata and dependency management make the project installable via
+  `pip` and buildable into wheel or source distributions.
+- Optional `dev` dependencies keep development tooling separate from runtime
+  requirements.
+
+### Build and publish
+
+You can now build distributable artifacts and publish them to an index such as
+PyPI:
+
+```bash
+python -m build   # or: hatch build
+```
+
+Install the package in other environments:
+
+```bash
+pip install .               # from the project root
+# or, after publishing
+pip install mcp-server
+```
+
+These packages can be used in CI/CD pipelines, Docker images, or any other
+environment where the MCP server needs to be reused or integrated.
+
 ## Code Structure and Adding new APIs
 
 Endpoints and tools are organized by domain under `mcp_server/`:
