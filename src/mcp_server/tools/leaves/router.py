@@ -1,16 +1,17 @@
 from fastapi import APIRouter, Header, HTTPException, Query
 import httpx
 from fastapi import APIRouter, Depends
-from .client import LeavesClient
-from mcp_server.auth_context import auth_header_getter
+import mcp_server.tools.leaves.client as leaves_client_module
+import mcp_server.auth_context as auth_context
+import mcp_server.tools.leaves.models as leaves_models
 
-from .models import (
-    ApplyLeaveRequest,
-    ApplyLeaveResponse,
-    HolidaysResponse,
-    LeavesResponse,
-    ApplyCompOffRequest
-)
+LeavesClient = leaves_client_module.LeavesClient
+auth_header_getter = auth_context.auth_header_getter
+ApplyLeaveRequest = leaves_models.ApplyLeaveRequest
+ApplyLeaveResponse = leaves_models.ApplyLeaveResponse
+HolidaysResponse = leaves_models.HolidaysResponse
+LeavesResponse = leaves_models.LeavesResponse
+ApplyCompOffRequest = leaves_models.ApplyCompOffRequest
 
 # Single client used by the FastAPI routes; tests patch methods on this instance.
 client = LeavesClient()

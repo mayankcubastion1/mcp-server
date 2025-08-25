@@ -8,8 +8,12 @@ import httpx
 from fastapi import APIRouter, Body, HTTPException, Request, status
 from pydantic import BaseModel, ValidationError
 
-from .tool_registry import all_tool_specs
-from .auth_context import set_request_headers, auth_header_getter
+import mcp_server.tool_registry as tool_registry
+import mcp_server.auth_context as auth_context
+
+all_tool_specs = tool_registry.all_tool_specs
+set_request_headers = auth_context.set_request_headers
+auth_header_getter = auth_context.auth_header_getter
 
 router = APIRouter(prefix="/mcp-compat", tags=["mcp-compat"])
 

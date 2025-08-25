@@ -2,8 +2,11 @@ from __future__ import annotations
 import os
 from typing import Any, Dict
 from mcp.server.fastmcp import FastMCP
-from .tool_registry import all_tool_specs
-from .auth_context import auth_header_getter
+import mcp_server.tool_registry as tool_registry
+import mcp_server.auth_context as auth_context
+
+all_tool_specs = tool_registry.all_tool_specs
+auth_header_getter = auth_context.auth_header_getter
 
 def build_mcp_server() -> FastMCP:
     mcp = FastMCP("XAgent HR MCP", stateless_http=True)

@@ -4,7 +4,9 @@ from typing import Callable, List, Optional
 import httpx
 from pydantic import BaseModel, Field
 from langchain_core.tools import StructuredTool
-from mcp_server.tools.base import ToolSpec
+import mcp_server.tools.base as tools_base
+
+ToolSpec = tools_base.ToolSpec
 
 class HoursRequest(BaseModel):
     startTime: str = Field(..., description="HH:MM (24h)")

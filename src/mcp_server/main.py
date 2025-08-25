@@ -1,15 +1,33 @@
 # src/mcp_server/main.py
 from fastapi import FastAPI, Request
-from .mcp_runtime import build_mcp_server
-from .auth_context import set_request_headers
-from .compat_rest import router as compat_router
-from .tools.leaves.router import router as leaves_router, client as leaves_client
-from .tools.attendance.router import router as attendance_router, client as attendance_client
-from .tools.feedback.router import router as feedback_router, client as feedback_client
-from .tools.tickets.router import router as tickets_router, client as tickets_client
-from .tools.team_management.router import router as team_router, client as team_client
-from .tools.miscellaneous.router import router as misc_router, client as misc_client
-from .tools.referrals.router import router as referrals_router, client as referrals_client
+import mcp_server.mcp_runtime as mcp_runtime
+import mcp_server.auth_context as auth_context
+import mcp_server.compat_rest as compat_rest
+import mcp_server.tools.leaves.router as leaves_router_module
+import mcp_server.tools.attendance.router as attendance_router_module
+import mcp_server.tools.feedback.router as feedback_router_module
+import mcp_server.tools.tickets.router as tickets_router_module
+import mcp_server.tools.team_management.router as team_router_module
+import mcp_server.tools.miscellaneous.router as misc_router_module
+import mcp_server.tools.referrals.router as referrals_router_module
+
+build_mcp_server = mcp_runtime.build_mcp_server
+set_request_headers = auth_context.set_request_headers
+compat_router = compat_rest.router
+leaves_router = leaves_router_module.router
+leaves_client = leaves_router_module.client
+attendance_router = attendance_router_module.router
+attendance_client = attendance_router_module.client
+feedback_router = feedback_router_module.router
+feedback_client = feedback_router_module.client
+tickets_router = tickets_router_module.router
+tickets_client = tickets_router_module.client
+team_router = team_router_module.router
+team_client = team_router_module.client
+misc_router = misc_router_module.router
+misc_client = misc_router_module.client
+referrals_router = referrals_router_module.router
+referrals_client = referrals_router_module.client
 
 app = FastAPI(title="XAgent HR MCP Host")
 

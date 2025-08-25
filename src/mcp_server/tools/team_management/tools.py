@@ -8,7 +8,9 @@ import httpx
 from langchain_core.tools import StructuredTool
 from pydantic import BaseModel, Field
 
-from mcp_server.tools.base import ToolSpec
+import mcp_server.tools.base as tools_base
+
+ToolSpec = tools_base.ToolSpec
 
 
 class TeamLedgerInput(BaseModel):

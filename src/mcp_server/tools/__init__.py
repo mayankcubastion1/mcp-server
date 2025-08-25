@@ -5,13 +5,15 @@ from typing import Callable, List, Optional
 import httpx
 from langchain_core.tools import StructuredTool
 
-from .base import ToolSpec
-from ..tools.attendance import tools as attendance_tools
-from ..tools.feedback import tools as feedback_tools
-from ..tools.leaves import tools as leaves_tools
-from ..tools.miscellaneous import tools as misc_tools
-from ..tools.team_management import tools as team_tools
-from ..tools.tickets import tools as tickets_tools
+import mcp_server.tools.base as base
+import mcp_server.tools.attendance.tools as attendance_tools
+import mcp_server.tools.feedback.tools as feedback_tools
+import mcp_server.tools.leaves.tools as leaves_tools
+import mcp_server.tools.miscellaneous.tools as misc_tools
+import mcp_server.tools.team_management.tools as team_tools
+import mcp_server.tools.tickets.tools as tickets_tools
+
+ToolSpec = base.ToolSpec
 
 
 def create_tool_specs(
