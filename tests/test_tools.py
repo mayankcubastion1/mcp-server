@@ -5,15 +5,19 @@ from fastapi.testclient import TestClient
 from pydantic import BaseModel
 
 from mcp_server.main import app, client as hrms_client
-from mcp_server.leaves.models import (
+from mcp_server.tools.leaves.models import (
     ApplyLeaveData,
     ApplyLeaveRequest,
     ApplyLeaveResponse,
     Holiday,
     HolidaysResponse,
 )
-from mcp_server.attendance.models import AttendanceEntry, AttendanceResponse, Paginate
-from mcp_server.attendance.router import client as attendance_client
+from mcp_server.tools.attendance.models import (
+    AttendanceEntry,
+    AttendanceResponse,
+    Paginate,
+)
+from mcp_server.tools.attendance.router import client as attendance_client
 from mcp_server.tools import create_langchain_tools, create_tool_specs
 
 
