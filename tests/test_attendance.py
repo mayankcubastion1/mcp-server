@@ -4,9 +4,13 @@ import pytest
 from fastapi.testclient import TestClient
 
 from mcp_server.main import app
-from mcp_server.attendance.models import AttendanceEntry, Paginate, AttendanceResponse
-from mcp_server.attendance.router import client as attendance_client
-from mcp_server.attendance.tools import create_langchain_tools
+from mcp_server.tools.attendance.models import (
+    AttendanceEntry,
+    Paginate,
+    AttendanceResponse,
+)
+from mcp_server.tools.attendance.router import client as attendance_client
+from mcp_server.tools.attendance.tools import create_langchain_tools
 
 client = TestClient(app)
 

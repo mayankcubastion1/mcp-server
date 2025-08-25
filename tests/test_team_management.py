@@ -4,13 +4,13 @@ import pytest
 from fastapi.testclient import TestClient
 
 from mcp_server.main import app
-from mcp_server.team_management.models import (
+from mcp_server.tools.team_management.models import (
     LedgerEntry,
     LeaveBalance,
     TeamLedgerResponse,
 )
-from mcp_server.team_management.router import client as team_client
-from mcp_server.team_management.tools import create_langchain_tools
+from mcp_server.tools.team_management.router import client as team_client
+from mcp_server.tools.team_management.tools import create_langchain_tools
 
 client = TestClient(app)
 

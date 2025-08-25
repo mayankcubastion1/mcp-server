@@ -4,7 +4,7 @@ from fastapi.testclient import TestClient
 import pytest
 
 from mcp_server.main import app, client as hrms_client
-from mcp_server.leaves.models import (
+from mcp_server.tools.leaves.models import (
     ApplyLeaveData,
     ApplyLeaveRequest,
     ApplyLeaveResponse,

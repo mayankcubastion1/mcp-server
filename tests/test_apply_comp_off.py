@@ -4,7 +4,11 @@ from fastapi.testclient import TestClient
 import pytest
 
 from mcp_server.main import app, client as hrms_client
-from mcp_server.leaves.models import ApplyLeaveData, ApplyLeaveRequest, ApplyLeaveResponse
+from mcp_server.tools.leaves.models import (
+    ApplyLeaveData,
+    ApplyCompOffRequest,
+    ApplyLeaveResponse,
+)
 
 client = TestClient(app)
 
@@ -30,18 +34,22 @@ def mock_apply_comp_off(monkeypatch):
         ),
     )
 
-    async def _mock(payload: ApplyLeaveRequest, auth_header: str) -> ApplyLeaveResponse:
+    async def _mock(
+        self, payload: ApplyCompOffRequest, auth_header: str
+    ) -> ApplyLeaveResponse:
         return sample
 
-    monkeypatch.setattr(hrms_client, "apply_comp_off", _mock)
+    monkeypatch.setattr(
+        "mcp_server.tools.leaves.router.LeavesClient.apply_comp_off", _mock
+    )
 
 
 payload = {
     "type": "Credit",
     "category": "Comp-Off",
-    "leaveCount": 1.0,
-    "leaveDate": "2025-06-01",
-    "comments": "worked upon agentic ai",
+    "compOffCount": 1.0,
+    "workingDate": "2025-06-01",
+    "description": "worked upon agentic ai",
     "status": "Pending Approval",
 }
 
