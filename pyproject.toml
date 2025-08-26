@@ -1,12 +1,10 @@
-# pyproject.toml
-
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
 name = "xmcp-hrms"
-version = "0.1.1"  # bump since 0.1.0 tag already exists
+version = "0.1.1"                     # <-- bump from 0.1.0
 description = "XAgent HR MCP server"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -31,10 +29,10 @@ dev = [
 [tool.hatch.build]
 sources = ["src"]
 
-# ✅ tell Hatch exactly which package to include in the wheel
+# ✅ This is the missing piece
 [tool.hatch.build.targets.wheel]
 packages = ["src/xmcp"]
 
-# (optional, belt-and-braces) keep tests out of sdists if you bring them back later
+# (optional) if you ever re-add tests, keep them out of sdists
 [tool.hatch.build.targets.sdist]
 exclude = ["/tests"]
