@@ -6,7 +6,8 @@ from typing import Any, Dict, Callable, List, Optional
 
 import httpx
 from langchain_core.tools import StructuredTool
-from pydantic import BaseModel, Field
+from datetime import date
+from pydantic import BaseModel, Field, ConfigDict
 
 import mcp_server.tools.base as tools_base
 import mcp_server.tools.leaves.models as leaves_models
@@ -19,8 +20,19 @@ ApplyCompOffRequest = leaves_models.ApplyCompOffRequest
 # ---- Input models for tools in this module ----
 
 class HolidaysInput(BaseModel):
-    """Input schema for the get_holidays tool."""
-    year: int = Field(..., description="Year for which to fetch holidays (e.g., 2025)")
+    """Input schema for the get_holidays tool.
+    Accepts LeaveDate from the MCP client and derives the year."""
+    # The MCP client sends "LeaveDate"; we alias to a Pythonic field name.
+    leaveDate: date = Field(
+        ...,
+        alias="LeaveDate",
+        description=(
+            "Date of the leave (YYYY-MM-DD or ISO8601). The tool extracts the year and "
+            "fetches holidays for that calendar year."
+        ),
+    )
+    # Allow population by alias (LeaveDate) or field name (leaveDate), ignore extra keys.
+    model_config = ConfigDict(populate_by_name=True, extra="ignore")
 
 
 class LeavesInput(BaseModel):
@@ -42,12 +54,13 @@ def create_tool_specs(
     base = base_url.rstrip("/")
     http_client = client or httpx.Client(base_url=base, timeout=30.0)
 
-    def _get_holidays(year: int) -> dict:
+    def _get_holidays(leaveDate: date) -> dict:
+        year = leaveDate.year
         r = http_client.get(
-            "/holidays",
-            params={"year": year},
-            headers={"Authorization": auth_header_getter()},
-        )
+             "/holidays",
+             params={"year": year},
+             headers={"Authorization": auth_header_getter()},
+         )
         r.raise_for_status()
         return r.json()
 
@@ -84,7 +97,9 @@ def create_tool_specs(
     return [
         ToolSpec(
             name="get_holidays",
-            description="Fetch holidays for the provided year.",
+            description=(
+                "Fetch holidays for the calendar year inferred from the provided LeaveDate."
+            ),
             args_schema=HolidaysInput,
             func=_get_holidays,
         ),
