@@ -67,8 +67,3 @@ client = leaves_client
 
 # Optional REST shim for Postman/curl sanity checks
 app.include_router(compat_router)
-
-# Optional: a quick health route
-@app.get("/health")
-def health():
-    return {"ok": True}
