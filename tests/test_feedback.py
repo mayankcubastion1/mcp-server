@@ -3,15 +3,15 @@ from datetime import date
 import pytest
 from fastapi.testclient import TestClient
 
-from mcp_server.main import app
-from mcp_server.tools.feedback.models import (
+from xmcp.main import app
+from xmcp.tools.feedback.models import (
     AddFeedbackRequest,
     AddFeedbackResponse,
     RMFeedbacksResponse,
     FeedbackLevelsResponse,
 )
-from mcp_server.tools.feedback.router import client as feedback_client
-from mcp_server.tools.feedback.tools import create_langchain_tools
+from xmcp.tools.feedback.router import client as feedback_client
+from xmcp.tools.feedback.tools import create_langchain_tools
 
 client = TestClient(app)
 

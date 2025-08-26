@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Header, HTTPException, Query
 import httpx
 from fastapi import APIRouter, Depends
-import mcp_server.tools.leaves.client as leaves_client_module
-import mcp_server.auth_context as auth_context
-import mcp_server.tools.leaves.models as leaves_models
+import xmcp.tools.leaves.client as leaves_client_module
+import xmcp.auth_context as auth_context
+import xmcp.tools.leaves.models as leaves_models
 
 LeavesClient = leaves_client_module.LeavesClient
 auth_header_getter = auth_context.auth_header_getter

@@ -1,6 +1,6 @@
-# MCP Server
+# XMCP
 
-This repository contains a [Model Context Protocol (MCP)] server exposing selected HRMS portal APIs over HTTP so they can be safely consumed by LLM and chatbot applications.
+XMCP is a [Model Context Protocol (MCP)] server exposing selected HRMS portal APIs over HTTP so they can be safely consumed by LLM and chatbot applications.
 
 ## Features
 
@@ -34,7 +34,7 @@ pip install -e .[dev]
 Run the application locally:
 
 ```bash
-uvicorn mcp_server.main:app --reload
+uvicorn xmcp.main:app --reload
 ```
 
 Example requests (replace `$TOKEN` with the user's bearer token):
@@ -68,13 +68,13 @@ pytest
 Build the container image:
 
 ```bash
-docker build -t mcp-server .
+docker build -t xmcp .
 ```
 
 Run the server in Docker:
 
 ```bash
-docker run -p 8000:8000 mcp-server
+docker run -p 8000:8000 xmcp
 ```
 
 The service will be available at `http://localhost:8000`.
@@ -107,7 +107,7 @@ Install the package in other environments:
 ```bash
 pip install .               # from the project root
 # or, after publishing
-pip install mcp-server
+pip install xmcp
 ```
 
 These packages can be used in CI/CD pipelines, Docker images, or any other
@@ -115,7 +115,7 @@ environment where the MCP server needs to be reused or integrated.
 
 ## Code Structure and Adding new APIs
 
-Endpoints and tools are organized by domain under `mcp_server/`:
+Endpoints and tools are organized by domain under `xmcp/`:
 
 - `leaves/`
 - `feedback/`
@@ -136,14 +136,14 @@ Following this pattern allows the MCP server to expand as additional HRMS APIs a
 
 ## Using from LangChain
 
-The module `mcp_server.tools` exposes helpers to register the MCP endpoints as
+The module `xmcp.tools` exposes helpers to register the MCP endpoints as
 tools.  Framework-agnostic specifications can be adapted to LangChain,
 LangGraph or any other agentic runtime. StructuredTool from LangChain is being
 deprecated, but we still provide helpers for backward compatibility.
 
 ```python
 # Framework-agnostic definitions
-from mcp_server.tools import create_tool_specs
+from xmcp.tools import create_tool_specs
 
 specs = create_tool_specs(
     base_url="http://localhost:8000",
@@ -151,7 +151,7 @@ specs = create_tool_specs(
 )
 
 # Convert to LangChain StructuredTool instances (deprecated but supported)
-from mcp_server.tools import create_langchain_tools
+from xmcp.tools import create_langchain_tools
 
 tools = create_langchain_tools(
     base_url="http://localhost:8000",

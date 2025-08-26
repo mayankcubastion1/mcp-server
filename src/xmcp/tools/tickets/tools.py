@@ -8,7 +8,7 @@ import httpx
 from langchain_core.tools import StructuredTool
 from pydantic import BaseModel, Field
 
-import mcp_server.tools.base as tools_base
+import xmcp.tools.base as tools_base
 
 ToolSpec = tools_base.ToolSpec
 

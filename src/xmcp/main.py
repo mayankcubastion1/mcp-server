@@ -1,17 +1,17 @@
-# src/mcp_server/main.py
+# src/xmcp/main.py
 from fastapi import FastAPI, Request
-import mcp_server.mcp_runtime as mcp_runtime
-import mcp_server.auth_context as auth_context
-import mcp_server.compat_rest as compat_rest
-import mcp_server.tools.leaves.router as leaves_router_module
-import mcp_server.tools.attendance.router as attendance_router_module
-import mcp_server.tools.feedback.router as feedback_router_module
-import mcp_server.tools.tickets.router as tickets_router_module
-import mcp_server.tools.team_management.router as team_router_module
-import mcp_server.tools.miscellaneous.router as misc_router_module
-import mcp_server.tools.referrals.router as referrals_router_module
+import xmcp.mcp_runtime as mcp_runtime
+import xmcp.auth_context as auth_context
+import xmcp.compat_rest as compat_rest
+import xmcp.tools.leaves.router as leaves_router_module
+import xmcp.tools.attendance.router as attendance_router_module
+import xmcp.tools.feedback.router as feedback_router_module
+import xmcp.tools.tickets.router as tickets_router_module
+import xmcp.tools.team_management.router as team_router_module
+import xmcp.tools.miscellaneous.router as misc_router_module
+import xmcp.tools.referrals.router as referrals_router_module
 
-build_mcp_server = mcp_runtime.build_mcp_server
+build_xmcp = mcp_runtime.build_xmcp
 set_request_headers = auth_context.set_request_headers
 compat_router = compat_rest.router
 leaves_router = leaves_router_module.router
@@ -40,7 +40,7 @@ async def _stash_headers(request: Request, call_next):
     return await call_next(request)
 
 # Mount MCP server (streamable HTTP → HTTP → SSE)
-mcp = build_mcp_server()
+mcp = build_xmcp()
 mounted = False
 for method in ("streamable_http_app", "http_app", "sse_app"):
     mount = getattr(mcp, method, None)

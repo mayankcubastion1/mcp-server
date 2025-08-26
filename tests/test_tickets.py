@@ -1,15 +1,15 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from mcp_server.main import app
-from mcp_server.tools.tickets.models import (
+from xmcp.main import app
+from xmcp.tools.tickets.models import (
     TicketEntry,
     Paginate,
     TicketsResponse,
     TicketOperationResponse,
 )
-from mcp_server.tools.tickets.router import client as tickets_client
-from mcp_server.tools.tickets.tools import create_langchain_tools
+from xmcp.tools.tickets.router import client as tickets_client
+from xmcp.tools.tickets.tools import create_langchain_tools
 
 client = TestClient(app)
 

@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 import httpx
-from mcp_server.main import app, client as hrms_client
+from xmcp.main import app, client as hrms_client
 import pytest
 
 client = TestClient(app)
@@ -8,9 +8,9 @@ client = TestClient(app)
 
 @pytest.fixture(autouse=True)
 def set_base_url(monkeypatch):
-    monkeypatch.setenv("http://localhost:8000", "http://testserver")
+    monkeypatch.setenv("HRMS_API_BASE_URL", "http://testserver")
     # Use the in-process FastAPI app for HTTP requests
-    monkeypatch.setattr("mcp_server.tools.leaves.tools.httpx.Client", lambda *args, **kwargs: client)
+    monkeypatch.setattr("xmcp.tools.leaves.tools.httpx.Client", lambda *args, **kwargs: client)
 
 
 @pytest.fixture
@@ -23,7 +23,7 @@ def mock_holidays_error(monkeypatch):
 def test_call_tool_propagates_http_error(mock_holidays_error):
     response = client.post(
         "/mcp-compat/call",
-        json={"name": "get_holidays", "arguments": {"year": 2025}},
+        json={"name": "get_holidays", "arguments": {"LeaveDate": "2025-01-01"}},
         headers={"Authorization": "Bearer token"},
     )
     assert response.status_code == 502

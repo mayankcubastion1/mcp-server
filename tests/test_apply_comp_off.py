@@ -3,8 +3,8 @@ from datetime import date, datetime
 from fastapi.testclient import TestClient
 import pytest
 
-from mcp_server.main import app, client as hrms_client
-from mcp_server.tools.leaves.models import (
+from xmcp.main import app, client as hrms_client
+from xmcp.tools.leaves.models import (
     ApplyLeaveData,
     ApplyCompOffRequest,
     ApplyLeaveResponse,
@@ -40,7 +40,7 @@ def mock_apply_comp_off(monkeypatch):
         return sample
 
     monkeypatch.setattr(
-        "mcp_server.tools.leaves.router.LeavesClient.apply_comp_off", _mock
+        "xmcp.tools.leaves.router.LeavesClient.apply_comp_off", _mock
     )
 
 

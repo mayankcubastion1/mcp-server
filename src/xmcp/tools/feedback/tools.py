@@ -8,8 +8,8 @@ import httpx
 from langchain_core.tools import StructuredTool
 from pydantic import BaseModel, Field
 
-import mcp_server.tools.base as tools_base
-import mcp_server.tools.feedback.models as feedback_models
+import xmcp.tools.base as tools_base
+import xmcp.tools.feedback.models as feedback_models
 
 ToolSpec = tools_base.ToolSpec
 AddFeedbackRequest = feedback_models.AddFeedbackRequest

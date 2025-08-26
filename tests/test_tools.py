@@ -4,21 +4,21 @@ import pytest
 from fastapi.testclient import TestClient
 from pydantic import BaseModel
 
-from mcp_server.main import app, client as hrms_client
-from mcp_server.tools.leaves.models import (
+from xmcp.main import app, client as hrms_client
+from xmcp.tools.leaves.models import (
     ApplyLeaveData,
     ApplyLeaveRequest,
     ApplyLeaveResponse,
     Holiday,
     HolidaysResponse,
 )
-from mcp_server.tools.attendance.models import (
+from xmcp.tools.attendance.models import (
     AttendanceEntry,
     AttendanceResponse,
     Paginate,
 )
-from mcp_server.tools.attendance.router import client as attendance_client
-from mcp_server.tools import create_langchain_tools, create_tool_specs
+from xmcp.tools.attendance.router import client as attendance_client
+from xmcp.tools import create_langchain_tools, create_tool_specs
 
 
 @pytest.fixture
@@ -85,7 +85,7 @@ def mock_apply_leave(monkeypatch):
 
 def test_get_holidays_tool(mock_get_holidays, tools):
     holidays_tool = next(t for t in tools if t.name == "get_holidays")
-    result = holidays_tool.invoke({"year": 2025})
+    result = holidays_tool.invoke({"leaveDate": "2025-01-26"})
     assert result["statusCode"] == 200
     assert result["data"][0]["descText"] == "Republic Day"
 

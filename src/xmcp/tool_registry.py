@@ -2,15 +2,15 @@
 from typing import Callable, List, Optional
 import httpx
 
-import mcp_server.tools.leaves.tools as leaves_tools
-import mcp_server.tools.attendance.tools as attendance_tools
-import mcp_server.tools.feedback.tools as feedback_tools
-import mcp_server.tools.tickets.tools as tickets_tools
-import mcp_server.tools.team_management.tools as team_tools
-import mcp_server.tools.miscellaneous.tools as misc_tools
+import xmcp.tools.leaves.tools as leaves_tools
+import xmcp.tools.attendance.tools as attendance_tools
+import xmcp.tools.feedback.tools as feedback_tools
+import xmcp.tools.tickets.tools as tickets_tools
+import xmcp.tools.team_management.tools as team_tools
+import xmcp.tools.miscellaneous.tools as misc_tools
 
 try:
-    import mcp_server.tools.referrals.tools as referrals_tools
+    import xmcp.tools.referrals.tools as referrals_tools
 except Exception:
     referrals_tools = None
 

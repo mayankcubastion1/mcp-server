@@ -1,4 +1,4 @@
-# src/mcp_server/leaves/tools.py
+# src/xmcp/leaves/tools.py
 from __future__ import annotations
 """Tools for interacting with leave-related MCP server endpoints."""
 
@@ -9,8 +9,8 @@ from langchain_core.tools import StructuredTool
 from datetime import date
 from pydantic import BaseModel, Field, ConfigDict
 
-import mcp_server.tools.base as tools_base
-import mcp_server.tools.leaves.models as leaves_models
+import xmcp.tools.base as tools_base
+import xmcp.tools.leaves.models as leaves_models
 
 ToolSpec = tools_base.ToolSpec
 ApplyLeaveRequest = leaves_models.ApplyLeaveRequest
