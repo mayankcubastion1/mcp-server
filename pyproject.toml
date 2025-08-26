@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "mcp-server"
+name = "xmcp"
 version = "0.1.0"
 description = "XAgent HR MCP server"
 readme = "README.md"

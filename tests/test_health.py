@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 
-from mcp_server.main import app
+from xmcp.main import app
 
 client = TestClient(app)
 

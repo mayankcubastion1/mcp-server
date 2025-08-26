@@ -3,7 +3,7 @@ from typing import Callable, List, Optional
 import httpx
 from pydantic import BaseModel, Field
 from langchain_core.tools import StructuredTool
-import mcp_server.tools.base as tools_base
+import xmcp.tools.base as tools_base
 
 ToolSpec = tools_base.ToolSpec
 

@@ -1,12 +1,12 @@
-"""Top-level package for mcp_server.
+"""Top-level package for xmcp.
 
 Re-exports the most commonly used helpers for convenience so users can
-simply ``import mcp_server`` and access the public API.
+simply ``import xmcp`` and access the public API.
 """
 
-import mcp_server.api as api
+import xmcp.api as api
 
-build_mcp_server = api.build_mcp_server
+build_xmcp = api.build_xmcp
 all_tool_specs = api.all_tool_specs
 create_tool_specs = api.create_tool_specs
 create_langchain_tools = api.create_langchain_tools

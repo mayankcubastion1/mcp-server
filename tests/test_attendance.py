@@ -3,14 +3,14 @@ from datetime import date, datetime
 import pytest
 from fastapi.testclient import TestClient
 
-from mcp_server.main import app
-from mcp_server.tools.attendance.models import (
+from xmcp.main import app
+from xmcp.tools.attendance.models import (
     AttendanceEntry,
     Paginate,
     AttendanceResponse,
 )
-from mcp_server.tools.attendance.router import client as attendance_client
-from mcp_server.tools.attendance.tools import create_langchain_tools
+from xmcp.tools.attendance.router import client as attendance_client
+from xmcp.tools.attendance.tools import create_langchain_tools
 
 client = TestClient(app)
 

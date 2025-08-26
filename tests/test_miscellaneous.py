@@ -3,14 +3,14 @@ from datetime import date
 import pytest
 from fastapi.testclient import TestClient
 
-from mcp_server.main import app
-from mcp_server.tools.miscellaneous.models import (
+from xmcp.main import app
+from xmcp.tools.miscellaneous.models import (
     FinancialYear,
     FinancialYearsResponse,
     ProfileResponse,
 )
-from mcp_server.tools.miscellaneous.router import client as misc_client
-from mcp_server.tools.miscellaneous.tools import create_langchain_tools
+from xmcp.tools.miscellaneous.router import client as misc_client
+from xmcp.tools.miscellaneous.tools import create_langchain_tools
 
 client = TestClient(app)
 

@@ -3,8 +3,8 @@ from datetime import date, datetime
 from fastapi.testclient import TestClient
 import pytest
 
-from mcp_server.main import app, client as hrms_client
-from mcp_server.tools.leaves.models import LeaveEntry, LeavesResponse
+from xmcp.main import app, client as hrms_client
+from xmcp.tools.leaves.models import LeaveEntry, LeavesResponse
 
 client = TestClient(app)
 
